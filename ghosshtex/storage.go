@@ -1,4 +1,4 @@
-package internal
+package ghosshtex
 
 import "sync"
 
@@ -8,7 +8,6 @@ type SharedResource struct {
 }
 
 func (r *SharedResource) Update(value string) {
-	// fmt.Println("requested update", value)
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.value = value
