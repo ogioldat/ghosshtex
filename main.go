@@ -5,10 +5,12 @@ import (
 )
 
 func main() {
-	server := ghosshtex.NewSSHServer()
 	editor := ghosshtex.NewEditor()
+	server := ghosshtex.NewSSHServer(editor)
+	defer server.OnExit()
 
-	server.SetHandler(editor)
-
-	server.Start()
+	if err := server.Start(); err != nil {
+		server.OnError()
+		panic(err) // or log.Fatal(err)
+	}
 }

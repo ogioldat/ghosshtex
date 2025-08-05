@@ -3,6 +3,7 @@ package ghosshtex
 import (
 	"errors"
 	"log"
+	"log/slog"
 	"net"
 	"os"
 	"sync"
@@ -31,7 +32,7 @@ type SessionHandler interface {
 	OnConnect()
 }
 
-func NewSSHServer() SSHServer {
+func NewSSHServer(handler SessionHandler) SSHServer {
 	var wg sync.WaitGroup
 
 	algos := ssh.SupportedAlgorithms()
@@ -56,31 +57,32 @@ func NewSSHServer() SSHServer {
 
 	privateBytes, err := os.ReadFile("id_rsa")
 	if err != nil {
-		log.Fatal("failed to load private key: ", err)
+		slog.Error("failed to load private key: ", err)
 	}
 
 	private, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
-		log.Fatal("failed to parse private key: ", err)
+		slog.Error("failed to parse private key: ", err)
 	}
 	config.AddHostKey(private)
 
 	return SSHServer{
 		config:  config,
-		handler: nil,
+		handler: handler,
 		wg:      &wg,
 	}
 }
 
-func (server *SSHServer) SetHandler(handler SessionHandler) {
-	server.handler = handler
-}
 func (server *SSHServer) Start() error {
+	server.OnStart()
+
 	listener, err := net.Listen("tcp", "0.0.0.0:2022")
 	if err != nil {
 		return err
 	}
-	log.Println("listening")
+
+	server.OnListen()
+
 	for {
 		newConn, err := listener.Accept()
 		if err != nil {
@@ -117,4 +119,25 @@ func (server *SSHServer) handleConnection(newConn net.Conn) {
 		}
 		server.handler.Handle(&session)
 	}
+}
+
+func (server *SSHServer) OnStart() {
+	slog.Info("Server started")
+}
+
+func (server *SSHServer) OnConnect() {
+	slog.Info("Server started")
+}
+
+func (server *SSHServer) OnListen() {
+	slog.Info("Server listening")
+
+}
+
+func (server *SSHServer) OnError() {
+	slog.Error("Error occurred")
+}
+
+func (server *SSHServer) OnExit() {
+	slog.Info("Server exited")
 }

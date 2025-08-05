@@ -1,6 +1,7 @@
 package ghosshtex
 
 import (
+	"fmt"
 	"io"
 
 	"github.com/charmbracelet/bubbles/textarea"
@@ -9,10 +10,11 @@ import (
 )
 
 type model struct {
-	viewport viewport.Model
 	textarea textarea.Model
 	err      error
 }
+
+type errMsg error
 
 func NewEditorTUI(output io.Writer) *tea.Program {
 	ta := textarea.New()
@@ -31,7 +33,6 @@ func NewEditorTUI(output io.Writer) *tea.Program {
 
 	initialModel := model{
 		textarea: ta,
-		viewport: vp,
 		err:      nil,
 	}
 
@@ -43,14 +44,29 @@ func (m model) Init() tea.Cmd {
 }
 
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var (
-		tiCmd tea.Cmd
-		vpCmd tea.Cmd
-	)
+	var cmd tea.Cmd
 
-	return m, tea.Batch(tiCmd, vpCmd)
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyEnter, tea.KeyCtrlC, tea.KeyCtrlD, tea.KeyEsc:
+			return m, tea.Quit
+		}
+
+	case errMsg:
+		m.err = msg
+		return m, nil
+	}
+
+	m.textarea, cmd = m.textarea.Update(msg)
+
+	return m, cmd
 }
 
 func (m model) View() string {
-	return "View from TUI"
+	return fmt.Sprintf(
+		"Welcome to text editor\n\n%s\n\n%s",
+		m.textarea.View(),
+		"(esc to quit)",
+	) + "\n"
 }
