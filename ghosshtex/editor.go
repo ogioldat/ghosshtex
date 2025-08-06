@@ -11,7 +11,12 @@ type Editor struct {
 }
 
 func NewEditor() *Editor {
-	return &Editor{text: "", onInput: []func(input string){}, onLoad: []func(){}, onClose: []func(){}}
+	return &Editor{
+		text:    "",
+		onInput: []func(input string){},
+		onLoad:  []func(){},
+		onClose: []func(){},
+	}
 }
 
 func (ed *Editor) Close() {
@@ -21,10 +26,8 @@ func (ed *Editor) Close() {
 }
 
 func (ed *Editor) Handle(session *Session) {
-	tui := NewEditorTUI(session.channel)
+	tui := NewEditorTUI(session.channel, session.channel)
 	tui.Run()
-
-	// session.channel.Write([]byte("test string"))
 }
 
 func (ed *Editor) OnConnect() {}

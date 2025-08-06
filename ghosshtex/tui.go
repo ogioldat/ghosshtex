@@ -16,7 +16,7 @@ type model struct {
 
 type errMsg error
 
-func NewEditorTUI(output io.Writer) *tea.Program {
+func NewEditorTUI(output io.Writer, input io.Reader) *tea.Program {
 	ta := textarea.New()
 	ta.Focus()
 
@@ -36,7 +36,11 @@ func NewEditorTUI(output io.Writer) *tea.Program {
 		err:      nil,
 	}
 
-	return tea.NewProgram(initialModel, tea.WithOutput(output))
+	return tea.NewProgram(
+		initialModel,
+		tea.WithOutput(output),
+		tea.WithInput(input),
+	)
 }
 
 func (m model) Init() tea.Cmd {

@@ -131,7 +131,6 @@ func (server *SSHServer) OnConnect() {
 
 func (server *SSHServer) OnListen() {
 	slog.Info("Server listening")
-
 }
 
 func (server *SSHServer) OnError() {

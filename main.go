@@ -11,6 +11,6 @@ func main() {
 
 	if err := server.Start(); err != nil {
 		server.OnError()
-		panic(err) // or log.Fatal(err)
+		panic(err)
 	}
 }
