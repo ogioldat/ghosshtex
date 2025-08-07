@@ -1,6 +1,6 @@
 # Ghosshtex 🚀
 
-A collaborative text editor over SSH, written in Go.
+A collaborative CLI text editor over SSH, written in Go.
 
 ## Project Goals 🎯
 
